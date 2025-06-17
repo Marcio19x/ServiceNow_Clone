@@ -61,6 +61,31 @@ router.post('/login', async (req, res) => {
   const { email, password } = req.body;
 
   try {
+    // ========================================
+    // ⚠️  TEMPORARY TESTING BYPASS - REMOVE BEFORE PRODUCTION ⚠️
+    // ========================================
+    // This is a hardcoded admin bypass for testing purposes only.
+    // This MUST be removed before deploying to production!
+    // Files to revert: backend/src/routes/authRoutes.ts (this section)
+    if (email === 'admin' && password === 'admin123') {
+      console.warn('🚨 WARNING: Using temporary admin bypass - REMOVE BEFORE PRODUCTION! 🚨');
+      
+      const token = jwt.sign(
+        { 
+          userId: 'temp-admin-bypass-id', 
+          email: 'admin', 
+          role: 'admin' 
+        },
+        process.env.JWT_SECRET!,
+        { expiresIn: '24h' }
+      );
+
+      return res.json({ token });
+    }
+    // ========================================
+    // END TEMPORARY TESTING BYPASS
+    // ========================================
+
     // Get user from database
     const { data: userData, error: userError } = await supabase
       .from('users')
